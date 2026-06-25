@@ -819,7 +819,7 @@
     };
 
     try {
-      const r = await fetch(apiBase() + '/videos', {
+      const r = await fetch(apiBase() + '/api/v1/videos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -837,7 +837,7 @@
 
   async function mptPollTask() {
     try {
-      const r = await fetch(apiBase() + '/tasks/' + mptTaskId);
+      const r = await fetch(apiBase() + '/api/v1/tasks/' + mptTaskId);
       const d = await r.json();
       const t = d?.data;
       if (!t) return;
