@@ -854,7 +854,7 @@
         clearInterval(mptPoll);
         const url = Array.isArray(t.videos) ? t.videos[0] : t.videos;
         mptShowResult(url);
-      } else if (t.state === 3) {
+      } else if (t.state === -1) {
         clearInterval(mptPoll);
         mptError(t.message || 'Generation failed.');
         mptSetBusy(false);
