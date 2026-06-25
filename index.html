@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nympro tools</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0b0b10;
+      --nav-bg:     rgba(11,11,16,0.85);
+      --surface:    #111118;
+      --surface-2:  #18181f;
+      --border:     rgba(255,255,255,0.07);
+      --accent:     #7c6fe0;
+      --accent-dim: rgba(124,111,224,0.15);
+      --text:       #e8e8f0;
+      --muted:      #5a5a70;
+      --tag:        rgba(124,111,224,0.25);
+    }
+
+    html, body { height: 100%; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ════════════════════════════
+       NAV
+    ════════════════════════════ */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 56px;
+      background: var(--nav-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 0;
+    }
+
+    /* Logo */
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      margin-right: 32px;
+      flex-shrink: 0;
+    }
+    .nav-logo svg { width: 28px; height: 28px; }
+    .nav-logo-text {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+    .nav-logo-text span { color: var(--accent); }
+
+    /* Nav items */
+    .nav-items {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      flex: 1;
+    }
+
+    .nav-item {
+      position: relative;
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 150ms, background 150ms;
+      white-space: nowrap;
+    }
+    .nav-btn:hover, .nav-btn.open {
+      color: var(--text);
+      background: rgba(255,255,255,0.05);
+    }
+    .nav-btn svg.chevron {
+      width: 14px; height: 14px;
+      transition: transform 200ms;
+      opacity: 0.5;
+    }
+    .nav-btn.open svg.chevron { transform: rotate(180deg); }
+
+    /* Badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .badge-soon { background: rgba(255,255,255,0.07); color: var(--muted); }
+    .badge-new  { background: var(--tag); color: var(--accent); }
+
+    /* Nav right */
+    .nav-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ════════════════════════════
+       DROPDOWN
+    ════════════════════════════ */
+    .dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      min-width: 320px;
+      background: #13131b;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 8px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-6px);
+      transition: opacity 180ms ease, transform 180ms ease, visibility 0s 180ms;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+    }
+    .nav-item:hover .dropdown,
+    .nav-item.open .dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .dropdown-header {
+      padding: 6px 10px 10px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .dropdown-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 6px 0;
+    }
+
+    .tool-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 140ms;
+      color: inherit;
+    }
+    .tool-card:hover {
+      background: rgba(255,255,255,0.05);
+    }
+    .tool-card.active {
+      background: var(--accent-dim);
+    }
+
+    .tool-icon {
+      width: 36px; height: 36px;
+      border-radius: 9px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 18px;
+    }
+
+    .tool-info { min-width: 0; }
+    .tool-name {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tool-desc {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
+    .tool-card-coming {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 10px;
+      border-radius: 10px;
+      opacity: 0.4;
+      cursor: default;
+    }
+    .tool-card-coming .tool-icon {
+      opacity: 0.5;
+    }
+
+    /* ════════════════════════════
+       MAIN CONTENT
+    ════════════════════════════ */
+    main {
+      padding-top: 56px;
+      min-height: 100vh;
+    }
+
+    /* Pages */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ── Home ── */
+    #page-home {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 56px);
+      text-align: center;
+      padding: 64px 24px;
+    }
+    .home-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .home-eyebrow::before, .home-eyebrow::after {
+      content: '';
+      display: block;
+      width: 32px;
+      height: 1px;
+      background: var(--accent);
+      opacity: 0.4;
+    }
+    .home-title {
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      max-width: 700px;
+      margin-bottom: 20px;
+    }
+    .home-title span { color: var(--accent); }
+    .home-sub {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 480px;
+      margin-bottom: 48px;
+    }
+    .home-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      transition: filter 150ms, box-shadow 150ms;
+    }
+    .home-cta:hover {
+      filter: brightness(1.12);
+      box-shadow: 0 6px 32px rgba(124,111,224,0.35);
+    }
+
+    /* Tool grid on home */
+    .home-tools {
+      margin-top: 72px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      width: 100%;
+      max-width: 800px;
+      text-align: left;
+    }
+    .home-tool-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      cursor: pointer;
+      transition: border-color 150ms, background 150ms;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .home-tool-card:hover {
+      border-color: rgba(124,111,224,0.4);
+      background: var(--surface-2);
+    }
+    .home-tool-card .icon { font-size: 28px; margin-bottom: 12px; }
+    .home-tool-card h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .home-tool-card p {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ── Tool page shell ── */
+    #page-mpt {
+      height: calc(100vh - 56px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tool-topbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .tool-topbar-icon { font-size: 20px; }
+    .tool-topbar-name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .tool-topbar-sep {
+      width: 1px;
+      height: 16px;
+      background: var(--border);
+      margin: 0 4px;
+    }
+    .tool-topbar-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .api-endpoint-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .api-endpoint-row input {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 11px;
+      padding: 4px 10px;
+      width: 200px;
+      outline: none;
+    }
+    .api-endpoint-row input:focus { border-color: var(--accent); }
+
+    .tool-body {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 32px 24px 64px;
+      background: var(--bg);
+    }
+
+    /* ─── MPT Form ─── */
+    .mpt-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .field { margin-bottom: 24px; }
+    .field label {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 9px;
+    }
+
+    textarea, input[type=text] {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      line-height: 1.6;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 150ms, box-shadow 150ms;
+    }
+    textarea { resize: vertical; min-height: 88px; }
+    textarea::placeholder, input::placeholder { color: var(--muted); }
+    textarea:focus, input[type=text]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(124,111,224,0.15);
+    }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+    .chip {
+      padding: 7px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 140ms;
+      user-select: none;
+    }
+    .chip:hover { border-color: var(--accent); color: var(--text); }
+    .chip.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 0 0 3px rgba(124,111,224,0.15);
+    }
+
+    .sep { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+    button.gen-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: filter 150ms, box-shadow 150ms;
+    }
+    button.gen-btn:hover:not(:disabled) {
+      filter: brightness(1.1);
+      box-shadow: 0 4px 24px rgba(124,111,224,0.35);
+    }
+    button.gen-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Progress */
+    #mpt-progress { display: none; margin-top: 20px; }
+    .prog-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .prog-track {
+      height: 3px;
+      background: var(--surface-2);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .prog-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 999px;
+      width: 0%;
+      transition: width 600ms ease-out;
+    }
+    .prog-fill.ind { width: 35% !important; animation: ind 1.5s ease-in-out infinite; }
+    @keyframes ind {
+      0%   { transform: translateX(-200%); }
+      100% { transform: translateX(400%); }
+    }
+    .prog-msg { font-size: 12px; color: var(--muted); margin-top: 8px; }
+
+    /* Result */
+    #mpt-result { display: none; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px; }
+    #mpt-result h4 {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    video { width: 100%; border-radius: 10px; background: #000; display: block; }
+    .result-btns { display: flex; gap: 10px; margin-top: 12px; }
+    button.sec-btn {
+      flex: 1;
+      padding: 10px;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 140ms, background 140ms;
+    }
+    button.sec-btn:hover { border-color: var(--accent); background: rgba(124,111,224,0.08); }
+
+    /* Error */
+    .err-box {
+      display: none;
+      margin-top: 14px;
+      padding: 10px 14px;
+      background: rgba(224,92,92,0.1);
+      border: 1px solid rgba(224,92,92,0.25);
+      border-radius: 9px;
+      color: #e05c5c;
+      font-size: 12.5px;
+    }
+
+    /* Status dot */
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #4caf87;
+      display: inline-block;
+      margin-right: 5px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════ NAV ══════════ -->
+<nav>
+  <a class="nav-logo" href="#" onclick="showPage('home')">
+    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="28" height="28" rx="8" fill="#7c6fe0"/>
+      <path d="M7 20V10l7-3 7 3v10l-7 3-7-3z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M7 10l7 3 7-3M14 13v10" stroke="#fff" stroke-width="1.5"/>
+    </svg>
+    <span class="nav-logo-text">nympro<span>.studio</span></span>
+  </a>
+
+  <div class="nav-items">
+
+    <!-- Tools dropdown -->
+    <div class="nav-item" id="nav-tools">
+      <button class="nav-btn" onclick="toggleNav('nav-tools')">
+        Tools
+        <svg class="chevron" viewBox="0 0 14 14" fill="none">
+          <path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="dropdown">
+        <div class="dropdown-header">AI Tools</div>
+
+        <a class="tool-card" id="nav-mpt" href="#" onclick="showPage('mpt'); closeNavs();">
+          <div class="tool-icon">🎬</div>
+          <div class="tool-info">
+            <div class="tool-name">
+              MoneyPrinterTurbo
+              <span class="badge badge-new">NEW</span>
+            </div>
+            <div class="tool-desc">AI short video generation</div>
+          </div>
+        </a>
+
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-header" style="padding-top:4px">Coming Soon</div>
+
+        <div class="tool-card-coming">
+          <div class="tool-icon" style="opacity:.4">✍️</div>
+          <div class="tool-info">
+            <div class="tool-name">Script Writer</div>
+            <div class="tool-desc">AI copywriting & scripts</div>
+          </div>
+        </div>
+
+        <div class="tool-card-coming">
+          <div class="tool-icon" style="opacity:.4">🖼️</div>
+          <div class="tool-info">
+            <div class="tool-name">Image Generator</div>
+            <div class="tool-desc">Batch AI image creation</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Placeholder items -->
+    <div class="nav-item">
+      <button class="nav-btn" style="cursor:default" disabled>
+        Automation
+        <span class="badge badge-soon">Soon</span>
+      </button>
+    </div>
+
+    <div class="nav-item">
+      <button class="nav-btn" style="cursor:default" disabled>
+        Analytics
+        <span class="badge badge-soon">Soon</span>
+      </button>
+    </div>
+
+  </div>
+
+  <div class="nav-right">
+    <span style="font-size:11px; color:var(--muted);">
+      <span class="status-dot"></span>tools.nympro.studio
+    </span>
+  </div>
+</nav>
+
+<!-- ══════════ PAGES ══════════ -->
+<main>
+
+  <!-- Home -->
+  <div id="page-home" class="page active">
+    <div class="home-eyebrow">nympro studio</div>
+    <h1 class="home-title">AI tools for <span>creators</span> &amp; makers</h1>
+    <p class="home-sub">A growing suite of tools to automate, create, and scale. Built for speed, designed to stay out of your way.</p>
+    <button class="home-cta" onclick="showPage('mpt')">
+      <span>🎬</span> Try MoneyPrinterTurbo
+    </button>
+
+    <div class="home-tools">
+      <a class="home-tool-card" href="#" onclick="showPage('mpt'); return false;">
+        <div class="icon">🎬</div>
+        <h3>MoneyPrinterTurbo</h3>
+        <p>Generate short-form videos with AI. Topic → script → footage → publish.</p>
+      </a>
+      <div class="home-tool-card" style="opacity:.4; cursor:default;">
+        <div class="icon">✍️</div>
+        <h3>Script Writer <span class="badge badge-soon" style="font-size:9px;">soon</span></h3>
+        <p>AI-powered copywriting and video scripts for any niche.</p>
+      </div>
+      <div class="home-tool-card" style="opacity:.4; cursor:default;">
+        <div class="icon">🖼️</div>
+        <h3>Image Generator <span class="badge badge-soon" style="font-size:9px;">soon</span></h3>
+        <p>Batch-generate on-brand visuals and thumbnails at scale.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MoneyPrinterTurbo -->
+  <div id="page-mpt" class="page">
+    <div class="tool-topbar">
+      <span class="tool-topbar-icon">🎬</span>
+      <span class="tool-topbar-name">MoneyPrinterTurbo</span>
+      <div class="tool-topbar-sep"></div>
+      <span class="tool-topbar-sub">AI short video generation · powered by local LLM</span>
+      <div class="api-endpoint-row">
+        <span>API:</span>
+        <input type="text" id="api-url" value="http://localhost:8080" placeholder="http://localhost:8080" />
+      </div>
+    </div>
+
+    <div class="tool-body">
+      <div class="mpt-card">
+
+        <div class="field">
+          <label>Video Topic</label>
+          <textarea id="mpt-subject" placeholder="E.g. 'Top 5 benefits of cold showers for energy and focus'"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Aspect Ratio</label>
+          <div class="chips" id="chips-aspect">
+            <div class="chip active" data-value="9:16">9:16 — Vertical (Reels / TikTok)</div>
+            <div class="chip"       data-value="16:9">16:9 — Landscape (YouTube)</div>
+            <div class="chip"       data-value="1:1">1:1 — Square (Instagram)</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Language</label>
+          <div class="chips" id="chips-lang">
+            <div class="chip active" data-value="en" data-voice="en-US-AriaNeural-Female">English</div>
+            <div class="chip"        data-value="ru" data-voice="ru-RU-SvetlanaNeural-Female">Russian</div>
+          </div>
+        </div>
+
+        <hr class="sep" />
+        <button class="gen-btn" id="mpt-gen-btn" onclick="mptGenerate()">Generate Video</button>
+
+        <div id="mpt-progress">
+          <div class="prog-label">
+            <span id="mpt-stage">Starting…</span>
+            <span id="mpt-pct"></span>
+          </div>
+          <div class="prog-track">
+            <div class="prog-fill ind" id="mpt-bar"></div>
+          </div>
+          <div class="prog-msg" id="mpt-msg"></div>
+        </div>
+
+        <div class="err-box" id="mpt-err"></div>
+
+        <div id="mpt-result">
+          <h4>Result</h4>
+          <video id="mpt-video" controls playsinline></video>
+          <div class="result-btns">
+            <button class="sec-btn" onclick="mptDownload()">Download MP4</button>
+            <button class="sec-btn" onclick="mptReset()">New Video</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  /* ── Navigation ── */
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    closeNavs();
+  }
+  function toggleNav(id) {
+    const el = document.getElementById(id);
+    const wasOpen = el.classList.contains('open');
+    closeNavs();
+    if (!wasOpen) el.classList.add('open');
+    el.querySelector('.nav-btn').classList.toggle('open', !wasOpen);
+  }
+  function closeNavs() {
+    document.querySelectorAll('.nav-item').forEach(el => {
+      el.classList.remove('open');
+      el.querySelector('.nav-btn')?.classList.remove('open');
+    });
+  }
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.nav-item')) closeNavs();
+  });
+
+  /* ── Chips ── */
+  ['chips-aspect', 'chips-lang'].forEach(gid => {
+    document.getElementById(gid).addEventListener('click', e => {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+      document.querySelectorAll('#' + gid + ' .chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+
+  function chipVal(gid) {
+    return document.querySelector('#' + gid + ' .chip.active')?.dataset.value || '';
+  }
+  function chipVoice() {
+    return document.querySelector('#chips-lang .chip.active')?.dataset.voice || 'en-US-AriaNeural-Female';
+  }
+  function apiBase() {
+    return (document.getElementById('api-url').value || 'http://localhost:8080').replace(/\/$/, '');
+  }
+
+  /* ── MPT ── */
+  let mptTaskId = null, mptPoll = null, mptVideoUrl = null;
+  const STAGES = ['Generating script…','Finding footage…','Processing audio…','Adding subtitles…','Encoding video…'];
+
+  async function mptGenerate() {
+    const subject = document.getElementById('mpt-subject').value.trim();
+    if (!subject) { mptError('Please enter a video topic.'); return; }
+
+    mptSetBusy(true);
+    mptHideError();
+    mptShowProgress();
+
+    const payload = {
+      video_subject: subject,
+      video_aspect: chipVal('chips-aspect'),
+      video_language: chipVal('chips-lang'),
+      voice_name: chipVoice(),
+      video_clip_duration: 5,
+      video_count: 1,
+    };
+
+    try {
+      const r = await fetch(apiBase() + '/videos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const d = await r.json();
+      if (!r.ok || !d?.data?.task_id) throw new Error(d?.message || 'Failed to start task');
+      mptTaskId = d.data.task_id;
+      mptPoll = setInterval(() => mptPollTask(), 3000);
+    } catch(e) {
+      mptError(e.message);
+      mptSetBusy(false);
+      mptHideProgress();
+    }
+  }
+
+  async function mptPollTask() {
+    try {
+      const r = await fetch(apiBase() + '/tasks/' + mptTaskId);
+      const d = await r.json();
+      const t = d?.data;
+      if (!t) return;
+      const pct = t.progress || 0;
+      const bar = document.getElementById('mpt-bar');
+      if (pct > 0) {
+        bar.classList.remove('ind');
+        bar.style.width = pct + '%';
+        document.getElementById('mpt-pct').textContent = pct + '%';
+        document.getElementById('mpt-stage').textContent = STAGES[Math.min(Math.floor(pct/20), 4)];
+      }
+      if (t.message) document.getElementById('mpt-msg').textContent = t.message;
+      if (t.state === 1) {
+        clearInterval(mptPoll);
+        const url = Array.isArray(t.videos) ? t.videos[0] : t.videos;
+        mptShowResult(url);
+      } else if (t.state === 3) {
+        clearInterval(mptPoll);
+        mptError(t.message || 'Generation failed.');
+        mptSetBusy(false);
+        mptHideProgress();
+      }
+    } catch(_) {}
+  }
+
+  function mptShowResult(url) {
+    mptVideoUrl = url;
+    document.getElementById('mpt-video').src = url;
+    document.getElementById('mpt-result').style.display = 'block';
+    document.getElementById('mpt-progress').style.display = 'none';
+    mptSetBusy(false);
+  }
+  function mptDownload() {
+    if (!mptVideoUrl) return;
+    const a = document.createElement('a'); a.href = mptVideoUrl; a.download = 'video.mp4'; a.click();
+  }
+  function mptReset() {
+    if (mptPoll) clearInterval(mptPoll);
+    mptTaskId = null; mptVideoUrl = null;
+    document.getElementById('mpt-result').style.display = 'none';
+    document.getElementById('mpt-video').src = '';
+    document.getElementById('mpt-subject').value = '';
+    mptHideProgress(); mptHideError(); mptSetBusy(false);
+  }
+  function mptSetBusy(v) { document.getElementById('mpt-gen-btn').disabled = v; }
+  function mptShowProgress() {
+    const el = document.getElementById('mpt-progress');
+    el.style.display = 'block';
+    const bar = document.getElementById('mpt-bar');
+    bar.classList.add('ind'); bar.style.width = '0%';
+    document.getElementById('mpt-pct').textContent = '';
+    document.getElementById('mpt-msg').textContent = '';
+    document.getElementById('mpt-stage').textContent = 'Starting…';
+  }
+  function mptHideProgress() { document.getElementById('mpt-progress').style.display = 'none'; }
+  function mptError(msg) { const e = document.getElementById('mpt-err'); e.textContent = msg; e.style.display = 'block'; }
+  function mptHideError() { document.getElementById('mpt-err').style.display = 'none'; }
+</script>
+</body>
+</html>
