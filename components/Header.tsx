@@ -2,17 +2,22 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase'
 
-const nav = [
-  { href: '/explore', label: 'Explore' },
-  { href: '/tools', label: 'Tools' },
+const tools = [
+  { name: 'Anonymous YouTube', href: 'https://invidious.nympro.studio', external: true },
+  { name: 'Canvas', href: '/tools/canvas', external: false },
+  { name: 'VideoPrinter', href: null },
+  { name: 'ViralCut', href: null },
+  { name: 'Farm Studio', href: null },
 ]
 
 export default function Header() {
   const path = usePathname()
   const [user, setUser] = useState<any>(null)
+  const [toolsOpen, setToolsOpen] = useState(false)
+  const toolsRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const sb = createClient()
@@ -21,6 +26,16 @@ export default function Header() {
       setUser(session?.user ?? null)
     })
     return () => subscription.unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    function onClick(e: MouseEvent) {
+      if (toolsRef.current && !toolsRef.current.contains(e.target as Node)) {
+        setToolsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onClick)
+    return () => document.removeEventListener('mousedown', onClick)
   }, [])
 
   async function signOut() {
@@ -46,18 +61,82 @@ export default function Header() {
       </Link>
 
       <nav style={{ display: 'flex', gap: '4px', flex: 1 }}>
-        {nav.map(n => (
-          <Link key={n.href} href={n.href} style={{
+        <Link href="/explore" style={{
+          padding: '5px 12px',
+          borderRadius: '6px',
+          fontSize: '13px',
+          color: path.startsWith('/explore') ? 'var(--text)' : 'var(--muted)',
+          background: path.startsWith('/explore') ? 'var(--surface)' : 'transparent',
+        }}>
+          Explore
+        </Link>
+
+        {/* Tools with dropdown */}
+        <div ref={toolsRef} style={{ position: 'relative' }}
+          onMouseEnter={() => setToolsOpen(true)}
+          onMouseLeave={() => setToolsOpen(false)}
+        >
+          <button style={{
             padding: '5px 12px',
             borderRadius: '6px',
             fontSize: '13px',
-            color: path.startsWith(n.href) ? 'var(--text)' : 'var(--muted)',
-            background: path.startsWith(n.href) ? 'var(--surface)' : 'transparent',
-            transition: 'color 0.15s',
+            color: path.startsWith('/tools') ? 'var(--text)' : 'var(--muted)',
+            background: path.startsWith('/tools') ? 'var(--surface)' : 'transparent',
+            border: 'none',
+            cursor: 'pointer',
           }}>
-            {n.label}
-          </Link>
-        ))}
+            Tools
+          </button>
+
+          {toolsOpen && (
+            <div style={{
+              position: 'absolute',
+              top: 'calc(100% + 8px)',
+              left: 0,
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: '8px',
+              padding: '6px',
+              minWidth: '200px',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+            }}>
+              {tools.map(t => t.href ? (
+                <a
+                  key={t.name}
+                  href={t.href}
+                  target={t.external ? '_blank' : '_self'}
+                  rel="noreferrer"
+                  onClick={() => setToolsOpen(false)}
+                  style={{
+                    display: 'block',
+                    padding: '8px 12px',
+                    fontSize: '13px',
+                    color: 'var(--text)',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface2)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                >
+                  {t.name}
+                </a>
+              ) : (
+                <div key={t.name} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '8px 12px',
+                  fontSize: '13px',
+                  color: 'var(--muted2)',
+                  borderRadius: '5px',
+                }}>
+                  {t.name}
+                  <span style={{ fontSize: '10px', letterSpacing: '0.04em' }}>SOON</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </nav>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
