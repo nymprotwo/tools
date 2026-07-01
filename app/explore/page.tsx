@@ -57,15 +57,19 @@ export default function ExplorePage() {
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1px', background: 'var(--border)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', background: 'var(--border)' }}>
         {items.map(item => (
           <div key={item.name} style={{
             background: 'var(--bg)',
-            padding: '24px',
+            padding: '24px 28px',
             display: 'flex',
             flexDirection: 'column',
             gap: '10px',
-          }}>
+            transition: 'background 0.15s',
+          }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'var(--bg)')}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '13px', fontWeight: 600 }}>{item.name}</span>
               <span style={{
