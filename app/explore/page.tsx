@@ -1,6 +1,4 @@
-import type { Metadata } from 'next'
-
-export const metadata: Metadata = { title: 'Explore — nympro' }
+'use client'
 
 const items = [
   {
