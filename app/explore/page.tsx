@@ -28,12 +28,20 @@ const items = [
     status: 'live',
   },
   {
-    name: 'YouTube',
+    name: 'Anonymous YouTube',
     badge: 'Tool',
     stack: 'iframe',
     desc: 'Watch YouTube without recommendations, comments, or sidebar noise. Paste a link and get a clean player.',
     url: '/tools/youtube',
     status: 'live',
+  },
+  {
+    name: 'VideoPrinter',
+    badge: 'Tool',
+    stack: 'Python · Whisper · ffmpeg',
+    desc: 'Automatic video creation with subtitles. Feed it content, get back a ready-to-publish video with burned-in captions.',
+    url: null,
+    status: 'dev',
   },
 ]
 

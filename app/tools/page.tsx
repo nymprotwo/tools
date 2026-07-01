@@ -4,8 +4,9 @@ import Link from 'next/link'
 export const metadata: Metadata = { title: 'Tools — nympro' }
 
 const tools = [
-  { name: 'YouTube', desc: 'Clean player, no distractions', href: '/tools/youtube', live: true },
+  { name: 'Anonymous YouTube', desc: 'Clean player, no distractions', href: '/tools/youtube', live: true },
   { name: 'Canvas', desc: 'Open whiteboard — draw anything', href: '/tools/canvas', live: true },
+  { name: 'VideoPrinter', desc: 'Auto video creation with subtitles', href: null, live: false },
   { name: 'ViralCut', desc: 'AI short-form clips from any video', href: null, live: false },
   { name: 'Farm Studio', desc: 'Automated content pipeline', href: null, live: false },
 ]
