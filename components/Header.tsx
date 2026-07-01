@@ -6,11 +6,11 @@ import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase'
 
 const tools = [
-  { name: 'Anonymous YouTube', href: 'https://invidious.nympro.studio', external: true },
-  { name: 'Canvas', href: '/tools/canvas', external: false },
-  { name: 'VideoPrinter', href: null },
-  { name: 'ViralCut', href: null },
-  { name: 'Farm Studio', href: null },
+  { name: 'Anonymous YouTube', desc: 'Watch without tracking or ads', href: 'https://invidious.nympro.studio', external: true },
+  { name: 'Canvas', desc: 'Open whiteboard, no login', href: '/tools/canvas', external: false },
+  { name: 'VideoPrinter', desc: 'Auto video with subtitles', href: null },
+  { name: 'ViralCut', desc: 'AI short clips from any video', href: null },
+  { name: 'Farm Studio', desc: 'Automated content pipeline', href: null },
 ]
 
 export default function Header() {
@@ -107,31 +107,20 @@ export default function Header() {
                   target={t.external ? '_blank' : '_self'}
                   rel="noreferrer"
                   onClick={() => setToolsOpen(false)}
-                  style={{
-                    display: 'block',
-                    padding: '8px 12px',
-                    fontSize: '13px',
-                    color: 'var(--text)',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                  }}
+                  style={{ display: 'block', padding: '8px 12px', borderRadius: '5px', cursor: 'pointer' }}
                   onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface2)')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                 >
-                  {t.name}
+                  <div style={{ fontSize: '13px', color: 'var(--text)' }}>{t.name}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '2px' }}>{t.desc}</div>
                 </a>
               ) : (
-                <div key={t.name} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '8px 12px',
-                  fontSize: '13px',
-                  color: 'var(--muted2)',
-                  borderRadius: '5px',
-                }}>
-                  {t.name}
-                  <span style={{ fontSize: '10px', letterSpacing: '0.04em' }}>SOON</span>
+                <div key={t.name} style={{ padding: '8px 12px', borderRadius: '5px' }}>
+                  <div style={{ fontSize: '13px', color: 'var(--muted2)', display: 'flex', justifyContent: 'space-between' }}>
+                    {t.name}
+                    <span style={{ fontSize: '10px', letterSpacing: '0.04em' }}>SOON</span>
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--muted2)', marginTop: '2px' }}>{t.desc}</div>
                 </div>
               ))}
             </div>
