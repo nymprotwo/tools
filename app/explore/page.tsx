@@ -4,14 +4,6 @@ export const metadata: Metadata = { title: 'Explore — nympro' }
 
 const items = [
   {
-    name: 'Iron Log',
-    badge: 'App',
-    stack: 'HTML · CSS · JS',
-    desc: 'Strength training tracker built for serious lifters. Exercises, sets, weights — nothing else. No subscriptions, no bullshit.',
-    url: 'https://sportbrain.nympro.studio',
-    status: 'live',
-  },
-  {
     name: 'ViralCut',
     badge: 'Tool',
     stack: 'Python · Whisper · GPT-4o · OpenCV',
@@ -41,14 +33,6 @@ const items = [
     stack: 'iframe',
     desc: 'Watch YouTube without recommendations, comments, or sidebar noise. Paste a link and get a clean player.',
     url: '/tools/youtube',
-    status: 'live',
-  },
-  {
-    name: 'North Jersey Dental Lab',
-    badge: 'Landing',
-    stack: 'HTML · CSS',
-    desc: 'B2B dental lab targeting NYC dentists. Hybrid digital/analog workflow, Top 3 Google badge. Built to convert.',
-    url: 'https://northjerseydentallab.nympro.studio',
     status: 'live',
   },
 ]
