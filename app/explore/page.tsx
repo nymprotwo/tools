@@ -30,9 +30,9 @@ const items = [
   {
     name: 'Anonymous YouTube',
     badge: 'Tool',
-    stack: 'iframe',
-    desc: 'Watch YouTube without recommendations, comments, or sidebar noise. Paste a link and get a clean player.',
-    url: '/tools/youtube',
+    stack: 'Invidious · PostgreSQL',
+    desc: 'YouTube without Google tracking. Search anything, watch any video — no ads, no recommendation poisoning, no history sent to Google.',
+    url: 'https://invidious.nympro.studio',
     status: 'live',
   },
   {
