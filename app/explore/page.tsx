@@ -55,18 +55,20 @@ export default function ExplorePage() {
         </p>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', background: 'var(--border)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
         {items.map(item => (
           <div key={item.name} style={{
-            background: 'var(--bg)',
-            padding: '24px 28px',
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '10px',
+            padding: '22px 24px',
             display: 'flex',
             flexDirection: 'column',
             gap: '10px',
-            transition: 'background 0.15s',
+            transition: 'border-color 0.15s',
           }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'var(--bg)')}
+            onMouseEnter={e => (e.currentTarget.style.borderColor = '#333')}
+            onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border)')}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '13px', fontWeight: 600 }}>{item.name}</span>
